@@ -1,8 +1,9 @@
 import cv2
 from multiprocessing import Process, Queue
+import time
 
 class Main:
-    defaultVideo = "vid.mkv"
+    defaultVideo = "vid2.mp4"
     def __init__(self):
         self.__name = "Main"
 
@@ -14,26 +15,26 @@ class Main:
         qrScannerProcess.start()
 
         # Start Video Player
-        self.showWindow()
+        #self.showWindow()
         videoQue = Queue()
         videoProcess = Process(target=self.playVideo, args=(videoQue,))
         videoProcess.start()
         # Wait for QR Scanner to find QR Code
         while True:
             if not QrQue.empty():
+                print("code found")
                 videoQue.put(QrQue.get())
             else:
                 pass
 
-    def showWindow(self):
+    def playVideo(self, q, videoPath=defaultVideo):
         cv2.namedWindow("Player", cv2.WND_PROP_FULLSCREEN)
         cv2.setWindowProperty("Player", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
-
-    def playVideo(self, q, videoPath=defaultVideo):
         cap = cv2.VideoCapture("videos/" + videoPath)
         while True:
             ret, frame = cap.read()
             if not q.empty():
+                print("vid changed")
                 videoPath = q.get()
                 cap = cv2.VideoCapture("videos/" + videoPath)
             if ret:
@@ -42,6 +43,8 @@ class Main:
                     break
             else:
                 break
+
+            cv2.waitKey(40)
         cap.release()
 
 class QRScanner:
@@ -55,12 +58,12 @@ class QRScanner:
             _, img = cam.read()
             data, bbox, _ = detector.detectAndDecode(img)
             if bbox is not None:
-                for i in range(len(bbox)):
-                    cv2.line(img, tuple(bbox[i][0]), tuple(bbox[(i+1) % len(bbox)][0]), color=(255, 0, 255), thickness=2)
+                #for i in range(len(bbox)):
+                    #cv2.line(img, tuple(bbox[i][0]), tuple(bbox[(i+1) % len(bbox)][0]), color=(255, 0, 255), thickness=2)
                 if data:
                     print("[+] QR Code detected, data:", data)
                     q.put(data)
-            cv2.imshow("img", img)
+                    time.sleep(5)
             if cv2.waitKey(1) == ord("q"):
                 break
 
