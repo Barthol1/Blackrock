@@ -21,7 +21,6 @@ class Main:
         videoProcess.start()
         # Wait for QR Scanner to find QR Code
         while True:
-            print("loop")
             if not QrQue.empty():
                 print("code found")
                 videoQue.put(QrQue.get())
@@ -60,7 +59,7 @@ class QRScanner:
             ret, frame = cap.read()
             if ret:
                 data, bbox, _ = detector.detectAndDecode(frame)
-                if bbox is not None:
+                if bbox is not None and data != "":
                     q.put(data)
             cv2.waitKey(20)
 
