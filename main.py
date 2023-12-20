@@ -30,22 +30,23 @@ class Main:
     def playVideo(self, q, videoPath=defaultVideo):
         cv2.namedWindow("Player", cv2.WND_PROP_FULLSCREEN)
         cv2.setWindowProperty("Player", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
-        cap = cv2.VideoCapture("videos/" + videoPath)
-        while True:
-            ret, frame = cap.read()
-            if not q.empty():
-                print("vid changed")
-                videoPath = q.get()
-                cap = cv2.VideoCapture("videos/" + videoPath)
-            if ret:
-                cv2.imshow("Player", frame)
-                if cv2.waitKey(1) & 0xFF == ord('q'):
-                    break
-            else:
-                break
 
-            cv2.waitKey(40)
-        cap.release()
+        stopped = False
+        while not stopped:
+            if not q.empty():
+                videoPath = q.get()
+            cap = cv2.VideoCapture("videos/" + videoPath)
+            while True:
+                ret, frame = cap.read()
+                if ret:
+                    cv2.imshow("Player", frame)
+                    if cv2.waitKey(1) & 0xFF == ord('q'):
+                        stopped = True
+                        break
+                else:
+                    #cap.release()
+                    break
+                cv2.waitKey(20)
 
 class QRScanner:
     def __init__(self):
