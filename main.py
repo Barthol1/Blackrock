@@ -46,6 +46,8 @@ class Main:
                 else:
                     #cap.release()
                     break
+                if not q.empty():
+                    break
                 cv2.waitKey(20)
 
 class QRScanner:
@@ -61,6 +63,7 @@ class QRScanner:
                 data, bbox, _ = detector.detectAndDecode(frame)
                 if bbox is not None and data != "":
                     q.put(data)
+                    time.sleep(3)
             cv2.waitKey(20)
 
 if __name__ == "__main__":
