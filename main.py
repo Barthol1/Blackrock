@@ -31,17 +31,26 @@ class Main:
     def playVideo(self, q, videoPath=defaultVideo):
         cv2.namedWindow("Player", cv2.WND_PROP_FULLSCREEN)
         cv2.setWindowProperty("Player", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
-
+        
+        notificationCounter = 0
         stopped = False
         while not stopped:
             if not q.empty():
                 videoPath = q.get()
+                notificationCounter = 20
+
             cap = cv2.VideoCapture("videos/" + videoPath + ".mp4")
             player = MediaPlayer("videos/" + videoPath + ".mp4")
 
             while True:
                 ret, frame = cap.read()
                 audio_frame, val = player.get_frame()
+                #show notification for scanning
+                if notificationCounter > 0:
+                    cv2.circle(frame, (50,50), 30, (0,255,0), -1)
+                    notificationCounter-=1
+                else:
+                    cv2.circle(frame, (50,50), 30, (220,220,220), -1)
 
                 if ret:
                     cv2.imshow("Player", frame)
