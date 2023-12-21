@@ -1,9 +1,10 @@
 import cv2
 from multiprocessing import Process, Queue
 import time
+from ffpyplayer.player import MediaPlayer
 
 class Main:
-    defaultVideo = "vid2.mp4"
+    defaultVideo = "vid3"
     def __init__(self):
         self.__name = "Main"
 
@@ -35,9 +36,13 @@ class Main:
         while not stopped:
             if not q.empty():
                 videoPath = q.get()
-            cap = cv2.VideoCapture("videos/" + videoPath)
+            cap = cv2.VideoCapture("videos/" + videoPath + ".mp4")
+            player = MediaPlayer("videos/" + videoPath + ".mp4")
+
             while True:
                 ret, frame = cap.read()
+                audio_frame, val = player.get_frame()
+
                 if ret:
                     cv2.imshow("Player", frame)
                     if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -48,6 +53,11 @@ class Main:
                     break
                 if not q.empty():
                     break
+                
+                if val != 'eof' and audio_frame is not None:
+                    #audio
+                    img, t = audio_frame
+
                 cv2.waitKey(20)
 
 class QRScanner:
